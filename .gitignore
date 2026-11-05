@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
-# LaTeX
+# Source LaTeX : le rapport est rédigé sur Overleaf
+*.tex
 *.aux
 *.log
 *.out
@@ -8,5 +9,3 @@ __pycache__/
 *.fls
 *.fdb_latexmk
 *.synctex.gz
-# Images du TP (fournies par l'enseignant)
-*.jpg

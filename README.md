@@ -1,63 +1,38 @@
 # TP Fuzzy C-means : segmentation floue d'une image
 
-M2 Informatique VMI, Reconnaissance des formes avancée.
+TP de reconnaissance des formes avancée, M2 Informatique VMI. Le code implémente Fuzzy C-means (FCM) avec NumPy et l'applique à l'image de la Voie lactée, en niveaux de gris et en couleur.
 
-## Contenu
+## Organisation du dépôt
 
-`fcm.py` contient l'algorithme : Fuzzy C-means écrit avec NumPy (initialisation, centres, degrés, fonction objectif), une variante accélérée sur l'histogramme pour les images en niveaux de gris, et un k-means dur pour comparer.
+`fcm.py` contient l'algorithme : initialisation, calcul des centres, calcul des degrés et fonction objectif. On y trouve aussi une version plus rapide pour les images en niveaux de gris, qui travaille sur l'histogramme, et un k-means dur qui sert de point de comparaison.
 
-`experiences.py` lance tous les essais du rapport et écrit `figures/` et `resultats.json`.
+`experiences.py` lance tous les essais. Il lit les deux images du sujet dans `data/`, enregistre les figures dans `figures/` et les valeurs numériques dans `resultats.json`.
 
-`rapport/rapport.tex` est le source du rapport, `rapport/rapport.pdf` la version compilée.
+`tests/test_fcm.py` vérifie les formules et le comportement de l'algorithme. Le rapport se trouve dans `rapport/rapport.pdf`.
 
-## Lancer
+## Lancer les expériences
 
-1. Installer les dépendances :
+Les dépendances s'installent avec pip :
 
-   ```
-   pip install numpy matplotlib pillow
-   ```
+```
+pip install numpy matplotlib pillow
+python experiences.py
+```
 
-2. Récupérer les deux images du sujet, `milky-way.jpg` et `milky-way-nvg.jpg` (elles ne sont pas dans le dépôt), et les mettre dans un dossier.
+L'exécution complète dure une à deux minutes, dont l'essentiel pour l'image couleur. Pour lire les images ailleurs que dans `data/`, il suffit d'indiquer leur dossier dans la variable d'environnement `FCM_DATA`.
 
-3. Indiquer ce dossier avec la variable d'environnement `FCM_DATA`, puis lancer le script :
-
-   ```
-   # Linux / macOS / Git Bash
-   FCM_DATA=chemin/vers/images python experiences.py
-
-   # PowerShell
-   $env:FCM_DATA = "chemin\vers\images"; python experiences.py
-   ```
-
-   Sans `FCM_DATA`, le script cherche les images dans le dossier `TP/` situé deux niveaux au-dessus de ce dépôt.
-
-L'exécution complète prend une à deux minutes, surtout à cause du cas couleur.
-
-## Tester
+## Lancer les tests
 
 ```
 python tests/test_fcm.py
 ```
 
-Chaque ligne affiche PASS ou FAIL : formules de l'annexe, convergence, cas limites, k-means et version histogramme.
+Chaque test affiche PASS ou FAIL. Les tests comparent les mises à jour aux formules de l'annexe, contrôlent que la fonction objectif décroît, que les centres de données synthétiques sont retrouvés et qu'une distance nulle ne produit pas de NaN. Ils vérifient enfin que la version histogramme donne le même résultat que la version pixel par pixel.
 
-## Recompiler le rapport
+## Lire le code
 
-```
-cd rapport
-pdflatex rapport.tex
-pdflatex rapport.tex
-```
+Le plus simple est de suivre l'ordre de l'annexe. `init_U` tire la matrice U au hasard puis normalise chaque ligne à 1. `update_centers` calcule chaque centre comme la moyenne des pixels pondérée par u^m. `update_U` donne à chaque pixel un degré par cluster, à partir de ses distances relatives aux centres. `fcm` répète ces deux mises à jour jusqu'à ce que U ne varie plus que de moins de `eps`.
 
-Les figures sont lues dans `../figures/`.
+Chaque pixel est une donnée : X a pour taille (1048576, 1) en niveaux de gris et (1048576, 3) en couleur. Pour afficher une heatmap, une colonne de U est remise au format 1024 x 1024.
 
-## Lire le code dans l'ordre
-
-1. `init_U` : on tire U au hasard, chaque ligne somme à 1.
-2. `update_centers` : chaque centre est la moyenne des pixels pondérée par u^m.
-3. `update_U` : chaque pixel reçoit un degré pour chaque cluster selon ses distances relatives aux centres.
-4. `fcm` : boucle 2 et 3 jusqu'à ce que U ne bouge presque plus (`eps`).
-5. `fcm_histogramme` : même algorithme sur les 256 niveaux de gris pondérés par leur nombre de pixels, environ 40 fois plus rapide pour le même résultat.
-
-Un pixel est une donnée. En niveaux de gris, X a la taille (1048576, 1) ; en couleur, (1048576, 3). Pour afficher une heatmap, on remet une colonne de U au format 1024 x 1024.
+`fcm_histogramme` applique la même boucle aux 256 niveaux de gris, chacun pondéré par son nombre de pixels. Sur l'image du TP, elle obtient les mêmes centres environ 40 fois plus vite.
