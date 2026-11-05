@@ -4,22 +4,24 @@ TP de reconnaissance des formes avancée, M2 Informatique VMI. Le code implémen
 
 ## Organisation du dépôt
 
-`fcm.py` contient l'algorithme : initialisation, calcul des centres, calcul des degrés et fonction objectif. On y trouve aussi une version plus rapide pour les images en niveaux de gris, qui travaille sur l'histogramme, et un k-means dur qui sert de point de comparaison.
+Le fichier principal est le notebook `tp_fcm.ipynb`. Il déroule tout le TP dans l'ordre, avec une courte explication avant chaque étape, et il est enregistré avec ses sorties : on peut lire les résultats et voir les figures sur GitHub sans rien exécuter.
 
-`experiences.py` lance tous les essais. Il lit les deux images du sujet dans `data/`, enregistre les figures dans `figures/` et les valeurs numériques dans `resultats.json`.
+`fcm.py` contient l'algorithme : initialisation, calcul des centres, calcul des degrés et fonction objectif. On y trouve aussi une version plus rapide pour les images en niveaux de gris, qui travaille sur l'histogramme, et un k-means dur qui sert de point de comparaison. Le notebook importe ces fonctions.
 
-`tests/test_fcm.py` vérifie les formules et le comportement de l'algorithme. Le rapport se trouve dans `rapport/rapport.pdf`.
+`experiences.py` refait les mêmes essais en script. Il enregistre les figures dans `figures/` et les valeurs numériques dans `resultats.json`.
 
-## Lancer les expériences
+`tests/test_fcm.py` vérifie les formules et le comportement de l'algorithme. Les images du sujet sont dans `data/` et le rapport dans `rapport/rapport.pdf`.
+
+## Lancer le notebook
 
 Les dépendances s'installent avec pip :
 
 ```
-pip install numpy matplotlib pillow
-python experiences.py
+pip install numpy matplotlib pillow jupyter
+jupyter notebook tp_fcm.ipynb
 ```
 
-L'exécution complète dure une à deux minutes, dont l'essentiel pour l'image couleur. Les deux images doivent se trouver dans `data/`.
+Une exécution complète prend environ une minute, dont une demi-minute pour l'image couleur. Pour obtenir les figures sous forme de fichiers, on peut aussi lancer `python experiences.py`.
 
 ## Lancer les tests
 
