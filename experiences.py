@@ -15,14 +15,11 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from PIL import Image
 
-from fcm import fcm, fcm_histogramme, kmeans
+from fcm import fcm, fcm_histogramme, kmeans, update_U
 
-import os
-
-ICI = Path(__file__).resolve().parent
-# Dossier des images du sujet : data/ du projet, ou FCM_DATA si définie.
-DATA = Path(os.environ.get("FCM_DATA", ICI / "data"))
-OUT = ICI / "figures"
+ICI = Path(__file__).parent      # dossier du projet
+DATA = ICI / "data"              # images du sujet
+OUT = ICI / "figures"            # figures produites
 OUT.mkdir(exist_ok=True)
 res = {}
 
@@ -41,6 +38,13 @@ def trier(U, C):
     return U[:, ordre], C[ordre]
 
 
+def part_ambigus(U):
+    """Pourcentage de pixels dont le plus grand degré est inférieur à 0,7
+    (pixels qui n'appartiennent nettement à aucun cluster)."""
+    degre_max = U.max(axis=1)
+    return float((degre_max < 0.7).mean()) * 100
+
+
 # 1) Niveaux de gris, K = 2, m = 2 (cas conseillé par le sujet)
 t = time.time()
 U2, C2, it2, J2 = fcm(Xg, K=2, m=2.0, eps=0.01, seed=0)
@@ -48,8 +52,7 @@ U2, C2 = trier(U2, C2)
 res["gris_K2"] = {"centres": C2.ravel().round(1).tolist(), "iterations": it2,
                   "temps_s": round(time.time() - t, 2),
                   "J_debut": round(J2[0]), "J_fin": round(J2[-1])}
-umax = U2.max(axis=1)
-res["gris_K2"]["part_pixels_ambigus_umax<0.7"] = round(float((umax < 0.7).mean()) * 100, 1)
+res["gris_K2"]["part_pixels_ambigus_umax<0.7"] = round(part_ambigus(U2), 1)
 res["gris_K2"]["part_pixels_galaxie_dur"] = round(float((U2[:, 1] > 0.5).mean()) * 100, 1)
 
 # 2) Effet de l'initialisation : 5 graines différentes
@@ -69,17 +72,15 @@ for e in [0.3, 0.1, 0.01, 0.001]:
 # 4) Effet du coefficient de flou m
 res["m"] = []
 courbes = {}
-niveaux = np.arange(256, dtype=np.float64)[:, None]
+niveaux = np.arange(256).reshape(-1, 1)     # les 256 niveaux de gris possibles
 for m in [1.2, 1.5, 2.0, 3.0, 5.0]:
     U, C, it, _ = fcm(Xg, K=2, m=m, eps=0.01, seed=0)
     U, C = trier(U, C)
-    amb = float((U.max(axis=1) < 0.7).mean()) * 100
     res["m"].append({"m": m, "iterations": it, "centres": C.ravel().round(1).tolist(),
-                     "part_ambigus": round(amb, 1)})
-    # Degré d'appartenance au cluster clair pour chaque niveau de gris 0..255
-    D = np.fmax(np.abs(niveaux - C.T), 1e-10)
-    inv = D ** (-2 / (m - 1))
-    courbes[m] = (inv / inv.sum(axis=1, keepdims=True))[:, 1]
+                     "part_ambigus": round(part_ambigus(U), 1)})
+    # Degré d'appartenance au cluster clair pour chaque niveau de gris 0..255 :
+    # même formule que l'étape 3, appliquée aux niveaux au lieu des pixels.
+    courbes[m] = update_U(niveaux, C, m)[:, 1]
 
 # 5) Comparaison avec k-means dur
 lab, Ck, itk = kmeans(Xg, K=2, seed=0)
@@ -92,7 +93,7 @@ res["kmeans_K2"] = {"centres": np.sort(Ck.ravel()).round(1).tolist(), "iteration
 U3, C3, it3, _ = fcm(Xg, K=3, m=2.0, eps=0.01, seed=0)
 U3, C3 = trier(U3, C3)
 res["gris_K3"] = {"centres": C3.ravel().round(1).tolist(), "iterations": it3,
-                  "part_ambigus": round(float((U3.max(axis=1) < 0.7).mean()) * 100, 1)}
+                  "part_ambigus": round(part_ambigus(U3), 1)}
 
 # 7) Couleur RGB, K = 4
 t = time.time()
@@ -102,8 +103,11 @@ res["couleur_K4"] = {"centres_RGB": Cc.round(0).tolist(), "iterations": itc,
                      "temps_s": round(time.time() - t, 2)}
 
 # 8) Alpha-coupes sur la région « galaxie » (cluster clair, K = 2)
-res["alpha_coupes_pct_pixels"] = {a: round(float((U2[:, 1] >= a).mean()) * 100, 1)
-                                  for a in [0.3, 0.5, 0.7, 0.9]}
+res["alpha_coupes_pct_pixels"] = {}
+for a in [0.3, 0.5, 0.7, 0.9]:
+    # alpha-coupe : pixels dont le degré « galaxie » est au moins alpha
+    dans_la_coupe = U2[:, 1] >= a
+    res["alpha_coupes_pct_pixels"][a] = round(float(dans_la_coupe.mean()) * 100, 1)
 
 # 9) FCM sur l'histogramme (256 niveaux pondérés) au lieu du million de pixels
 t = time.time()
