@@ -1,0 +1,186 @@
+{
+  "gris_K2": {
+    "centres": [
+      27.4,
+      112.8
+    ],
+    "iterations": 12,
+    "temps_s": 3.62,
+    "J_debut": 1107994634,
+    "J_fin": 464646541,
+    "part_pixels_ambigus_umax<0.7": 8.8,
+    "part_pixels_galaxie_dur": 33.5
+  },
+  "graines": [
+    {
+      "seed": 0,
+      "iterations": 12,
+      "centres": [
+        27.44,
+        112.78
+      ]
+    },
+    {
+      "seed": 1,
+      "iterations": 11,
+      "centres": [
+        27.42,
+        112.71
+      ]
+    },
+    {
+      "seed": 2,
+      "iterations": 12,
+      "centres": [
+        27.43,
+        112.74
+      ]
+    },
+    {
+      "seed": 3,
+      "iterations": 12,
+      "centres": [
+        27.38,
+        112.58
+      ]
+    },
+    {
+      "seed": 4,
+      "iterations": 13,
+      "centres": [
+        27.41,
+        112.67
+      ]
+    }
+  ],
+  "epsilon": [
+    {
+      "eps": 0.3,
+      "iterations": 2,
+      "centres": [
+        56.93,
+        57.16
+      ]
+    },
+    {
+      "eps": 0.1,
+      "iterations": 9,
+      "centres": [
+        26.73,
+        110.16
+      ]
+    },
+    {
+      "eps": 0.01,
+      "iterations": 12,
+      "centres": [
+        27.44,
+        112.78
+      ]
+    },
+    {
+      "eps": 0.001,
+      "iterations": 15,
+      "centres": [
+        27.55,
+        113.11
+      ]
+    }
+  ],
+  "m": [
+    {
+      "m": 1.2,
+      "iterations": 11,
+      "centres": [
+        29.1,
+        113.1
+      ],
+      "part_ambigus": 1.5
+    },
+    {
+      "m": 1.5,
+      "iterations": 11,
+      "centres": [
+        28.6,
+        113.4
+      ],
+      "part_ambigus": 4.5
+    },
+    {
+      "m": 2.0,
+      "iterations": 12,
+      "centres": [
+        27.4,
+        112.8
+      ],
+      "part_ambigus": 8.8
+    },
+    {
+      "m": 3.0,
+      "iterations": 14,
+      "centres": [
+        25.6,
+        110.9
+      ],
+      "part_ambigus": 18.9
+    },
+    {
+      "m": 5.0,
+      "iterations": 21,
+      "centres": [
+        24.3,
+        109.4
+      ],
+      "part_ambigus": 38.6
+    }
+  ],
+  "kmeans_K2": {
+    "centres": [
+      29.1,
+      112.4
+    ],
+    "iterations": 6,
+    "accord_avec_fcm_pct": 100.0
+  },
+  "gris_K3": {
+    "centres": [
+      22.7,
+      81.1,
+      141.7
+    ],
+    "iterations": 28,
+    "part_ambigus": 15.1
+  },
+  "couleur_K4": {
+    "centres_RGB": [
+      [
+        17.0,
+        21.0,
+        29.0
+      ],
+      [
+        59.0,
+        60.0,
+        75.0
+      ],
+      [
+        112.0,
+        103.0,
+        115.0
+      ],
+      [
+        180.0,
+        160.0,
+        167.0
+      ]
+    ],
+    "iterations": 28,
+    "temps_s": 21.28
+  },
+  "alpha_coupes_pct_pixels": {
+    "0.3": 37.9,
+    "0.5": 33.5,
+    "0.7": 29.0,
+    "0.9": 19.6
+  }
+}
