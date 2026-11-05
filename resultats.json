@@ -5,7 +5,7 @@
       112.8
     ],
     "iterations": 12,
-    "temps_s": 3.62,
+    "temps_s": 3.42,
     "J_debut": 1107994634,
     "J_fin": 464646541,
     "part_pixels_ambigus_umax<0.7": 8.8,
@@ -175,12 +175,23 @@
       ]
     ],
     "iterations": 28,
-    "temps_s": 21.28
+    "temps_s": 21.64
   },
   "alpha_coupes_pct_pixels": {
     "0.3": 37.9,
     "0.5": 33.5,
     "0.7": 29.0,
     "0.9": 19.6
+  },
+  "histogramme_K2": {
+    "centres": [
+      27.44,
+      112.78
+    ],
+    "iterations": 10,
+    "temps_s": 0.079,
+    "ecart_max_U_avec_fcm_pixels": 4.5733138252512795e-05,
+    "accord_argmax_pct": 100.0,
+    "acceleration": 43
   }
 }
