@@ -19,7 +19,7 @@ pip install numpy matplotlib pillow
 python experiences.py
 ```
 
-L'exécution complète dure une à deux minutes, dont l'essentiel pour l'image couleur. Pour lire les images ailleurs que dans `data/`, il suffit d'indiquer leur dossier dans la variable d'environnement `FCM_DATA`.
+L'exécution complète dure une à deux minutes, dont l'essentiel pour l'image couleur. Les deux images doivent se trouver dans `data/`.
 
 ## Lancer les tests
 
@@ -35,4 +35,4 @@ Le plus simple est de suivre l'ordre de l'annexe. `init_U` tire la matrice U au 
 
 Chaque pixel est une donnée : X a pour taille (1048576, 1) en niveaux de gris et (1048576, 3) en couleur. Pour afficher une heatmap, une colonne de U est remise au format 1024 x 1024.
 
-`fcm_histogramme` applique la même boucle aux 256 niveaux de gris, chacun pondéré par son nombre de pixels. Sur l'image du TP, elle obtient les mêmes centres environ 40 fois plus vite.
+`fcm_histogramme` applique la même boucle aux 256 niveaux de gris, chacun pondéré par son nombre de pixels. Sur l'image du TP, elle obtient les mêmes centres environ 100 fois plus vite.
