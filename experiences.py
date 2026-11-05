@@ -15,7 +15,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from PIL import Image
 
-from fcm import fcm, kmeans
+from fcm import fcm, fcm_histogramme, kmeans
 
 import os
 
@@ -105,6 +105,17 @@ res["couleur_K4"] = {"centres_RGB": Cc.round(0).tolist(), "iterations": itc,
 # 8) Alpha-coupes sur la région « galaxie » (cluster clair, K = 2)
 res["alpha_coupes_pct_pixels"] = {a: round(float((U2[:, 1] >= a).mean()) * 100, 1)
                                   for a in [0.3, 0.5, 0.7, 0.9]}
+
+# 9) FCM sur l'histogramme (256 niveaux pondérés) au lieu du million de pixels
+t = time.time()
+Uh, Ch, ith, Jh = fcm_histogramme(Xg, K=2, m=2.0, eps=0.01, seed=0)
+th = time.time() - t
+Uh, Ch = trier(Uh, Ch)
+res["histogramme_K2"] = {"centres": Ch.ravel().round(2).tolist(), "iterations": ith,
+                         "temps_s": round(th, 3),
+                         "ecart_max_U_avec_fcm_pixels": float(np.abs(Uh - U2).max()),
+                         "accord_argmax_pct": round(float((Uh.argmax(1) == U2.argmax(1)).mean()) * 100, 2),
+                         "acceleration": round(res["gris_K2"]["temps_s"] / th)}
 
 # ---------------------------------------------------------------- figures
 plt.rcParams.update({"font.size": 9})

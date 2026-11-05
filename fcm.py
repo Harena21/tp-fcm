@@ -26,14 +26,19 @@ def init_U(N, K, rng):
     return U / U.sum(axis=1, keepdims=True)
 
 
-def update_centers(X, U, m):
+def update_centers(X, U, m, w=None):
     """Étape 2 : c_j = somme_i u_ij^m x_i / somme_i u_ij^m.
 
     C'est une moyenne pondérée : un pixel qui appartient fortement au
     cluster j tire davantage le centre vers lui. Avec des u_ij valant 0 ou 1,
     on retrouve la moyenne classique de k-means.
+
+    w (optionnel, taille N) : poids de chaque donnée. Sert pour l'histogramme,
+    où une donnée = un niveau de gris qui compte pour w_i pixels.
     """
     Um = U ** m                                   # (N, K)
+    if w is not None:
+        Um = Um * w[:, None]
     return (Um.T @ X) / Um.sum(axis=0)[:, None]   # (K, d)
 
 
@@ -60,13 +65,16 @@ def update_U(X, C, m):
     return inv / inv.sum(axis=1, keepdims=True)
 
 
-def objective(X, U, C, m):
+def objective(X, U, C, m, w=None):
     """Fonction objectif Jm = somme_i somme_j u_ij^m ||x_i - c_j||^2."""
     D = distances(X, C)
-    return float(((U ** m) * D ** 2).sum())
+    termes = (U ** m) * D ** 2
+    if w is not None:
+        termes = termes * w[:, None]
+    return float(termes.sum())
 
 
-def fcm(X, K, m=2.0, eps=0.01, max_iter=300, seed=0):
+def fcm(X, K, m=2.0, eps=0.01, max_iter=300, seed=0, w=None):
     """Lance Fuzzy C-means.
 
     X        : données (N, d)
@@ -76,25 +84,46 @@ def fcm(X, K, m=2.0, eps=0.01, max_iter=300, seed=0):
                max_ij |U(k+1) - U(k)| < eps
     max_iter : garde-fou si l'arrêt n'est jamais atteint
     seed     : graine du tirage aléatoire de U(0), pour pouvoir rejouer un essai
+    w        : poids des données (optionnel), voir update_centers
 
     Retourne U (N, K), C (K, d), le nombre d'itérations et l'historique de Jm.
     """
     X = np.asarray(X, dtype=np.float64)
     if X.ndim == 1:
         X = X[:, None]                 # un seul attribut : on passe en (N, 1)
+    if w is not None:
+        w = np.asarray(w, dtype=np.float64)
     rng = np.random.default_rng(seed)
 
     U = init_U(X.shape[0], K, rng)     # étape 1
     history = []
     for k in range(1, max_iter + 1):
-        C = update_centers(X, U, m)    # étape 2
-        U_new = update_U(X, C, m)      # étape 3
-        history.append(objective(X, U_new, C, m))
+        C = update_centers(X, U, m, w)  # étape 2
+        U_new = update_U(X, C, m)       # étape 3
+        history.append(objective(X, U_new, C, m, w))
         delta = np.abs(U_new - U).max()
         U = U_new
-        if delta < eps:                # étape 4
+        if delta < eps:                 # étape 4
             break
     return U, C, k, history
+
+
+def fcm_histogramme(X, K, m=2.0, eps=0.01, max_iter=300, seed=0):
+    """FCM accéléré pour une image en niveaux de gris.
+
+    Une image 8 bits n'a que 256 valeurs possibles, et le degré u_ij ne dépend
+    que de la valeur du pixel. On fait donc tourner FCM sur les valeurs
+    distinctes, chacune pondérée par son nombre de pixels (l'histogramme),
+    puis on recopie le degré de chaque valeur sur ses pixels.
+    On travaille sur au plus 256 données au lieu d'un million.
+
+    Mêmes entrées et sorties que fcm (X de taille (N,) ou (N, 1)).
+    """
+    valeurs, inverse, effectifs = np.unique(np.asarray(X).ravel(),
+                                            return_inverse=True, return_counts=True)
+    U, C, k, history = fcm(valeurs, K, m=m, eps=eps, max_iter=max_iter,
+                           seed=seed, w=effectifs)
+    return U[inverse], C, k, history
 
 
 def kmeans(X, K, max_iter=300, seed=0):
