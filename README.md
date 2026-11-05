@@ -34,6 +34,14 @@ M2 Informatique VMI, Reconnaissance des formes avancée.
 
 L'exécution complète prend une à deux minutes, surtout à cause du cas couleur.
 
+## Tester
+
+```
+python tests/test_fcm.py
+```
+
+Chaque ligne affiche PASS ou FAIL : formules de l'annexe, convergence, cas limites, k-means et version histogramme.
+
 ## Recompiler le rapport
 
 ```
