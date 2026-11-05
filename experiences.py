@@ -20,9 +20,8 @@ from fcm import fcm, fcm_histogramme, kmeans
 import os
 
 ICI = Path(__file__).resolve().parent
-# Dossier des images fournies : variable d'environnement FCM_DATA si définie,
-# sinon le dossier TP/ du cours (deux niveaux au-dessus de ce fichier).
-DATA = Path(os.environ.get("FCM_DATA", ICI.parent.parent / "TP"))
+# Dossier des images du sujet : data/ du projet, ou FCM_DATA si définie.
+DATA = Path(os.environ.get("FCM_DATA", ICI / "data"))
 OUT = ICI / "figures"
 OUT.mkdir(exist_ok=True)
 res = {}
